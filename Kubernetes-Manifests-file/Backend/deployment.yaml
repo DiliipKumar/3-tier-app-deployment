@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: api
+  namespace: three-tier
+  labels: 
+    role: api
+    env: demo
+spec: 
+  replicas: 2
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+  selector: 
+    matchLabels:
+      role: api
+  template:
+    metadata:
+      labels:
+        role: api
+    spec:
+      imagePullSecrets:
+      - name: ecr-registry-secret
+      containers:
+      - name: api
+        image: public.ecr.aws/x4k1f4f2/three-tier-backend:latest
+        imagePullPolicy: Always
+        env:
+          - name: MONGO_CONN_STR
+            value: mongodb+srv://dilipkumar17072002:6Ac7As1BGhqIwAln@dilip-cluster.trjxuig.mongodb.net/mydatabase
+          - name: MONGO_USERNAME
+            value: dilipkumar17072002
+          - name: MONGO_PASSWORD
+            value: 6Ac7As1BGhqIwAln
+        ports:
+        - containerPort: 3500
+        # livenessProbe: 
+        #   httpGet:
+        #     path: /ok
+        #     port: 3500
+        #   initialDelaySeconds: 2
+        #   periodSeconds: 5
+        # readinessProbe:
+        #   httpGet:
+        #     path: /ok
+        #     port: 3500
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
+        #   successThreshold: 1
